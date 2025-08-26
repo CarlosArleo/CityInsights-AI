@@ -45,7 +45,7 @@ export default function ControlSidebar({ projectId }: ControlSidebarProps) {
 
   return (
     <div 
-      className="absolute top-0 left-0 z-10 w-[350px] h-screen flex flex-col bg-gray-900/70 backdrop-blur-sm text-[var(--sidebar-foreground)] shadow-2xl"
+      className="absolute top-0 left-0 z-10 w-[350px] h-screen flex flex-col bg-gray-900/20 backdrop-blur-sm text-[var(--sidebar-foreground)] shadow-2xl"
     >
       <SidebarHeader project={project} loading={loading} />
       <ScrollArea className="flex-1">
