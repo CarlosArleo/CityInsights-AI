@@ -2,7 +2,6 @@
 'use client';
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import Header from '@/components/layout/Header';
 import ControlSidebar from '@/components/project/ControlSidebar';
 import MapComponent from '@/components/project/MapComponent';
 import { MapProvider } from '@/context/MapContext';
@@ -19,12 +18,9 @@ export default function ProjectPage({ params }: ProjectPageParams) {
   return (
     <ProtectedRoute>
       <MapProvider>
-        <div className="flex h-screen w-full flex-col bg-background">
-          <Header />
-          <main className="relative flex-1">
-            <MapComponent />
-            <ControlSidebar projectId={projectId} />
-          </main>
+        <div className="relative h-screen w-screen bg-gray-900">
+          <MapComponent />
+          <ControlSidebar projectId={projectId} />
         </div>
       </MapProvider>
     </ProtectedRoute>
