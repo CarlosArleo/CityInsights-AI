@@ -1,34 +1,27 @@
-
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Allow users to read and write their own project documents
+    // Projects can be read or written only by their owner.
     match /projects/{projectId} {
       allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
+
+      // This rule secures the sub-collection of files for a specific project.
+      match /files/{fileId} {
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      }
+
+      // This rule secures the sub-collection of reviews for a specific project.
+      match /reviews/{reviewId} {
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      }
     }
-
-    // Allow users to read and write files within projects they own
-    match /projects/{projectId}/files/{fileId} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
-    }
-
-    // Allow users to read and write reviews within projects they own
-    match /projects/{projectId}/reviews/{reviewId} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
-    }
-
-    // Collection group rules for querying across projects
-    // These are essential for the dashboard and analysis flows
-
-    // Allow reading files if the user is the owner
-    match /{path=**}/files/{fileId} {
-      allow read: if request.auth != null && resource.data.ownerId == request.auth.uid;
-    }
-
-    // Allow reading reviews if the user is the owner
+    
+    // This collection group rule allows cross-project queries (e.g. by an admin)
+    // but still ensures that the user is the owner of the document.
     match /{path=**}/reviews/{reviewId} {
-      allow read: if request.auth != null && resource.data.ownerId == request.auth.uid;
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
     }
   }
 }
