@@ -7,7 +7,7 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Plus, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, CheckCircle, AlertCircle } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
 import { processGeospatialData } from '@/ai/flows/process-geospatial-data';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,9 +23,9 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     }
   };
 
-  const triggerAnalysis = async (fileId: string, fileContent: string) => {
+  const triggerAnalysis = async (fileId: string, fileContent: string, ownerId: string) => {
     try {
-      await analyzeDocument({ projectId, fileId, fileContent });
+      await analyzeDocument({ projectId, fileId, fileContent, ownerId });
     } catch (error) {
       console.error('Failed to trigger analysis flow:', error);
        toast({
@@ -51,7 +51,10 @@ export default function FileUpload({ projectId }: { projectId: string }) {
 
 
   const handleUpload = async (file: File) => {
-    if (!file) return;
+    if (!file || !projectId || !user) {
+       toast({ variant: 'destructive', title: 'Authentication or Project Error' });
+       return;
+    }
 
     const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
     const isGeoJson = file.type === 'application/geo+json' || file.name.toLowerCase().endsWith('.geojson');
@@ -64,12 +67,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       });
       return;
     }
-
-    if (!projectId || !user) {
-       toast({ variant: 'destructive', title: 'Authentication or Project Error' });
-       return;
-    }
-
+    
     setIsUploading(true);
     
     const toastId = toast({
@@ -83,8 +81,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     uploadTask.on(
       'state_changed',
       (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        // Optionally update toast with progress here
+        // Optional: update toast with progress here
       },
       (error) => {
         console.error('Upload failed:', error);
@@ -104,8 +101,9 @@ export default function FileUpload({ projectId }: { projectId: string }) {
             storagePath: uploadTask.snapshot.ref.fullPath,
             type: fileType,
             status: 'uploaded',
-            createdAt: serverTimestamp(),
+            ownerId: user.uid, // Add ownerId to file document
             projectId: projectId,
+            createdAt: serverTimestamp(),
           });
 
           toast({
@@ -119,7 +117,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
              const reader = new FileReader();
              reader.onload = (e) => {
                const text = e.target?.result as string;
-               triggerAnalysis(newFileDoc.id, text);
+               triggerAnalysis(newFileDoc.id, text, user.uid);
              };
              reader.readAsText(file);
           } else if (fileType === 'geojson') {

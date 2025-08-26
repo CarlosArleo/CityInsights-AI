@@ -10,7 +10,7 @@
  */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {doc, updateDoc, collection, addDoc} from 'firebase/firestore';
+import {doc, updateDoc, collection, addDoc, getDoc} from 'firebase/firestore';
 import {db} from '@/lib/firebase/config';
 
 // Defines the structure for a single key insight found by the AI
@@ -35,6 +35,7 @@ const AnalyzeDocumentInputSchema = z.object({
   projectId: z.string(),
   fileId: z.string(),
   fileContent: z.string(), // The full text content of the document
+  ownerId: z.string(),
 });
 export type AnalyzeDocumentInput = z.infer<typeof AnalyzeDocumentInputSchema>;
 
@@ -72,9 +73,8 @@ const analyzeDocumentFlow = ai.defineFlow(
     outputSchema: z.void(),
   },
   async (input) => {
-    const { projectId, fileId, fileContent } = input;
+    const { projectId, fileId, fileContent, ownerId } = input;
     
-    // Update file status to 'processing'
     const fileRef = doc(db, 'projects', projectId, 'files', fileId);
     await updateDoc(fileRef, { status: 'processing' });
     
@@ -88,18 +88,17 @@ const analyzeDocumentFlow = ai.defineFlow(
                     ...insight,
                     projectId: projectId,
                     fileId: fileId,
+                    ownerId: ownerId, // Add ownerId to the review document
                     status: 'pending', // 'pending', 'accepted', 'rejected'
                     createdAt: new Date().toISOString(),
                 });
             }
         }
         
-        // Update file status to 'completed'
         await updateDoc(fileRef, { status: 'completed' });
 
     } catch (error) {
         console.error('Error during document analysis:', error);
-        // Update file status to 'failed'
         await updateDoc(fileRef, { status: 'failed' });
     }
   }

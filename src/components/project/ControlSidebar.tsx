@@ -8,9 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FileUpload from '@/components/project/FileUpload';
 import DocumentList from '@/components/project/DocumentList';
 import GeospatialLayerList from './GeospatialLayerList';
-import ReviewCard, { Review } from './ReviewCard';
-import DisparateImpactAnalysis from './DisparateImpactAnalysis';
-import { AnalyzeEquityRiskOutput } from '@/ai/flows/equity-risk-analysis';
+import ReviewList from './ReviewList';
 import StrategicAnalysis from './StrategicAnalysis';
 import SidebarHeader from './SidebarHeader';
 import { Separator } from '../ui/separator';
@@ -27,8 +25,6 @@ interface ControlSidebarProps {
 export default function ControlSidebar({ projectId }: ControlSidebarProps) {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     if (!projectId) return;
@@ -47,22 +43,6 @@ export default function ControlSidebar({ projectId }: ControlSidebarProps) {
 
     return () => unsubscribe();
   }, [projectId]);
-
-  useEffect(() => {
-    if (!projectId) return;
-
-    setReviewsLoading(true);
-    const q = doc(db, 'projects', projectId);
-    const reviewsCol = collection(q, 'reviews');
-    const unsubscribe = onSnapshot(query(reviewsCol, where('status', '==', 'pending')), (snapshot) => {
-        const reviewsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
-        setReviews(reviewsData);
-        setReviewsLoading(false);
-    });
-
-    return () => unsubscribe();
-}, [projectId]);
-
 
   return (
     <div 
@@ -88,21 +68,7 @@ export default function ControlSidebar({ projectId }: ControlSidebarProps) {
             <Separator className="my-3 bg-sidebar-border" />
 
              {/* HITL Review Panel */}
-             <div>
-                <h2 className="text-lg font-semibold mb-2">Analysis Review</h2>
-                 {reviewsLoading ? (
-                    <div className="space-y-2">
-                        <Skeleton className="h-20 w-full bg-gray-700/50" />
-                        <Skeleton className="h-20 w-full bg-gray-700/50" />
-                    </div>
-                ) : reviews.length > 0 ? (
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-                        {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
-                    </div>
-                ) : (
-                    <p className="text-sm text-gray-400 text-center py-4">No pending reviews.</p>
-                )}
-            </div>
+             <ReviewList projectId={projectId} />
 
             <Separator className="my-3 bg-sidebar-border" />
 
