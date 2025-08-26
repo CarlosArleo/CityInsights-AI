@@ -1,0 +1,27 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if a user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the requesting user is the owner of the project
+    function isProjectOwner(projectId) {
+      return isAuthenticated() && request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId;
+    }
+
+    // Projects can be read or written only by the user who owns them.
+    match /projects/{projectId} {
+      allow read, write: if isProjectOwner(projectId);
+
+      // Files and Reviews can be read or written only by the owner of the parent project.
+      match /{subcollection}/{docId} {
+        allow read, write: if isProjectOwner(projectId);
+      }
+    }
+  }
+}
