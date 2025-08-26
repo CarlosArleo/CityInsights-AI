@@ -36,21 +36,26 @@ export default function ReviewList({ projectId }: ReviewListProps) {
     return () => unsubscribe();
   }, [projectId]);
 
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-24 w-full bg-gray-700/50 rounded-md" />
+        <Skeleton className="h-24 w-full bg-gray-700/50 rounded-md" />
+      </div>
+    );
+  }
+  
+  if (reviews.length === 0) {
+    return (
+      <div className="flex items-center justify-center p-4 bg-black/20 rounded-md">
+        <p className="text-sm text-gray-400 text-center">No insights are pending review.</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-2">Analysis Review</h2>
-      {loading ? (
-        <div className="space-y-2">
-          <Skeleton className="h-20 w-full bg-gray-700/50" />
-          <Skeleton className="h-20 w-full bg-gray-700/50" />
-        </div>
-      ) : reviews.length > 0 ? (
-        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-          {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
-        </div>
-      ) : (
-        <p className="text-sm text-gray-400 text-center py-4">No pending reviews.</p>
-      )}
+    <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2 -mr-2">
+      {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
     </div>
   );
 }

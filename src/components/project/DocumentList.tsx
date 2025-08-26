@@ -70,17 +70,19 @@ export default function DocumentList({ projectId }: DocumentListProps) {
 
   if (files.length === 0) {
     return (
-      <p className="text-sm text-gray-400 px-2 py-4 text-center">No documents uploaded.</p>
+      <div className="flex items-center justify-center p-4 bg-black/20 rounded-md">
+        <p className="text-sm text-gray-400">No documents uploaded yet.</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 bg-black/20 p-2 rounded-md">
       {files.map((file) => (
-        <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-transparent hover:bg-white/5">
-          <div className="flex items-center gap-3">
-            <FileText className="h-4 w-4 text-gray-300" />
-            <span className="text-sm font-medium truncate">{file.name}</span>
+        <div key={file.id} className="flex items-center justify-between p-2 rounded-md hover:bg-white/5">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <FileText className="h-4 w-4 text-gray-300 flex-shrink-0" />
+            <span className="text-sm font-medium truncate" title={file.name}>{file.name}</span>
           </div>
           <FileStatusIcon status={file.status} />
         </div>

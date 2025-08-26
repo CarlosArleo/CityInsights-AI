@@ -64,12 +64,14 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
 
   if (files.length === 0) {
     return (
-       <p className="text-sm text-gray-400 px-2 py-4 text-center">No map layers uploaded.</p>
+       <div className="flex items-center justify-center p-4 bg-black/20 rounded-md">
+        <p className="text-sm text-gray-400">No map layers uploaded yet.</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 bg-black/20 p-2 rounded-md">
       {files.map((file, index) => {
         const isVisible = activeLayers[file.id]?.visible || false;
         const color = layerColors[index % layerColors.length];
@@ -83,8 +85,8 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
               className="border-gray-500 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <Label htmlFor={`layer-${file.id}`} className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-              <div className="w-4 h-4 rounded-sm border border-white/50" style={{ backgroundColor: color }} />
-              <span>{file.name}</span>
+              <div className="w-3 h-3 rounded-sm border border-white/50" style={{ backgroundColor: color }} />
+              <span className="truncate" title={file.name}>{file.name}</span>
             </Label>
           </div>
         )
