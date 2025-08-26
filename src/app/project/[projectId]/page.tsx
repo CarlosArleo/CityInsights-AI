@@ -5,18 +5,18 @@ import { MapProvider } from '@/context/MapContext';
 
 interface ProjectPageProps {
   params: {
-    id: string;
+    projectId: string;
   };
 }
 
 // This is now a Server Component
 export default function ProjectPage({ params }: ProjectPageProps) {
-  const { id } = params;
+  const { projectId } = params;
 
   return (
     <ProtectedRoute>
       <MapProvider>
-        <ProjectWorkspace projectId={id} />
+        <ProjectWorkspace projectId={projectId} />
       </MapProvider>
     </ProtectedRoute>
   );
