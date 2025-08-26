@@ -30,7 +30,7 @@ export default function ProjectList() {
     setLoading(true);
     const q = query(
       collection(db, 'projects'), 
-      where('userId', '==', user.uid),
+      where('ownerId', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
     
@@ -44,6 +44,9 @@ export default function ProjectList() {
       });
       setProjects(projectsData);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching projects: ", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();

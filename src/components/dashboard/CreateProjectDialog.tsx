@@ -39,7 +39,7 @@ export function CreateProjectDialog({ userId }: CreateProjectDialogProps) {
     setLoading(true);
     try {
       await addDoc(collection(db, 'projects'), {
-        userId,
+        ownerId: userId,
         name: projectName,
         createdAt: serverTimestamp(),
         fileCount: 0,
