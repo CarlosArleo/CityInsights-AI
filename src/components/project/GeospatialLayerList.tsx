@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '../ui/checkbox';
@@ -35,7 +35,8 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
     const filesQuery = query(
       collection(db, 'projects', projectId, 'files'),
       where('type', '==', 'geojson'),
-      where('status', '==', 'completed')
+      where('status', '==', 'completed'),
+      orderBy('createdAt', 'desc')
     );
 
     const unsubscribe = onSnapshot(filesQuery, (querySnapshot) => {
@@ -45,6 +46,9 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
       });
       setFiles(filesData);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching geospatial layers:", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();
