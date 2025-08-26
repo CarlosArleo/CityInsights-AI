@@ -3,32 +3,44 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Projects can be read by any authenticated user, but only written by the owner.
+    // Rules for the 'projects' collection
     match /projects/{projectId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == resource.data.ownerId;
+      // Allow reading a single project or listing projects only if the user is the owner.
+      // The list rule ensures that any query on the projects collection MUST include a filter for ownerId.
+      allow get: if request.auth != null && resource.data.ownerId == request.auth.uid;
+      allow list: if request.auth != null && request.query.resource.data.ownerId == request.auth.uid;
 
-      // Rules for sub-collections must be defined within the parent match block.
-      
-      // Allow read/write on files only by the project owner.
+      // Allow creating a project only if the user is setting themselves as the owner.
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+
+      // Allow updating a project only if the user is the owner.
+      allow update: if request.auth != null && resource.data.ownerId == request.auth.uid;
+
+      // Allow deleting a project only if the user is the owner.
+      allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+
+      // Rules for the 'files' sub-collection
       match /files/{fileId} {
-        allow read, write: if request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
+        // A user can read or write a file document if they own the parent project.
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
       }
 
-      // Allow read/write on reviews only by the project owner.
+      // Rules for the 'reviews' sub-collection
       match /reviews/{reviewId} {
-         allow read, write: if request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
+        // A user can read or write a review document if they own the parent project.
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
       }
     }
-    
-    // Collection group rules for querying across projects.
-    
+
+    // Rules for collection group queries. These are important for AI flows and other cross-project queries.
     match /{path=**}/files/{fileId} {
-       allow read, write: if request.auth.uid == resource.data.ownerId;
+        // Allow read/write access to a file if the user's ID matches the ownerId on the file document itself.
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
     }
-    
+
     match /{path=**}/reviews/{reviewId} {
-      allow read, write: if request.auth.uid == resource.data.ownerId;
+       // Allow read/write access to a review if the user's ID matches the ownerId on the review document itself.
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerId;
     }
   }
 }
