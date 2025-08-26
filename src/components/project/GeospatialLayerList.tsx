@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Map } from 'lucide-react';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { useMap } from '@/context/MapContext';
@@ -35,7 +34,8 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
     setLoading(true);
     const filesQuery = query(
       collection(db, 'projects', projectId, 'files'),
-      where('type', '==', 'geojson')
+      where('type', '==', 'geojson'),
+      where('status', '==', 'completed')
     );
 
     const unsubscribe = onSnapshot(filesQuery, (querySnapshot) => {
@@ -71,20 +71,18 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
       {files.map((file, index) => {
         const isVisible = activeLayers[file.id]?.visible || false;
         const color = layerColors[index % layerColors.length];
-        const isReady = file.status === 'completed';
-
+        
         return (
           <div key={file.id} className="flex items-center gap-3">
             <Checkbox
               id={`layer-${file.id}`}
               checked={isVisible}
               onCheckedChange={() => toggleLayer(file.id, file.url, color)}
-              disabled={!isReady}
+              className="border-gray-500 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <Label htmlFor={`layer-${file.id}`} className="flex items-center gap-2 cursor-pointer text-sm">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: isReady ? color : '#666' }} />
-              <span className={!isReady ? 'text-gray-500' : ''}>{file.name}</span>
-              {!isReady && <span className='text-xs text-gray-400'>({file.status})</span>}
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+              <span>{file.name}</span>
             </Label>
           </div>
         )
