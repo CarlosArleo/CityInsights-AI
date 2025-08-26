@@ -31,7 +31,7 @@ const KeyInsightSchema = z.object({
 export type KeyInsight = z.infer<typeof KeyInsightSchema>;
 
 // Defines the input schema for the analysis flow
-const AnalyzeDocumentInputSchema = z.object({
+export const AnalyzeDocumentInputSchema = z.object({
   projectId: z.string(),
   fileId: z.string(),
   fileContent: z.string(), // The full text content of the document
@@ -66,7 +66,7 @@ const analysisPrompt = ai.definePrompt({
 });
 
 
-const analyzeDocumentFlow = ai.defineFlow(
+export const analyzeDocumentFlow = ai.defineFlow(
   {
     name: 'analyzeDocumentFlow',
     inputSchema: AnalyzeDocumentInputSchema,
@@ -103,8 +103,3 @@ const analyzeDocumentFlow = ai.defineFlow(
     }
   }
 );
-
-
-export async function analyzeDocument(input: AnalyzeDocumentInput) {
-    return analyzeDocumentFlow(input);
-}

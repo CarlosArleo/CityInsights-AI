@@ -66,7 +66,7 @@ const equityRiskPrompt = ai.definePrompt({
 });
 
 
-const analyzeEquityRiskFlow = ai.defineFlow(
+export const analyzeEquityRiskFlow = ai.defineFlow(
   {
     name: 'analyzeEquityRiskFlow',
     inputSchema: AnalyzeEquityRiskInputSchema,
@@ -103,7 +103,3 @@ const analyzeEquityRiskFlow = ai.defineFlow(
     return output;
   }
 );
-
-export async function analyzeEquityRisk(input: AnalyzeEquityRiskInput): Promise<AnalyzeEquityRiskOutput> {
-    return analyzeEquityRiskFlow(input);
-}

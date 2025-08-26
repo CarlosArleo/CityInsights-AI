@@ -11,13 +11,13 @@ import {doc, updateDoc} from 'firebase/firestore';
 import {db} from '@/lib/firebase/config';
 
 // Defines the input schema for the flow
-const ProcessGeoJsonInputSchema = z.object({
+export const ProcessGeoJsonInputSchema = z.object({
   projectId: z.string(),
   fileId: z.string(),
 });
 export type ProcessGeoJsonInput = z.infer<typeof ProcessGeoJsonInputSchema>;
 
-const processGeospatialDataFlow = ai.defineFlow(
+export const processGeospatialDataFlow = ai.defineFlow(
   {
     name: 'processGeospatialDataFlow',
     inputSchema: ProcessGeoJsonInputSchema,
@@ -35,7 +35,3 @@ const processGeospatialDataFlow = ai.defineFlow(
     await updateDoc(fileRef, { status: 'completed' });
   }
 );
-
-export async function processGeospatialData(input: ProcessGeoJsonInput) {
-    return processGeospatialDataFlow(input);
-}
