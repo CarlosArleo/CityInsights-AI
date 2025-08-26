@@ -13,12 +13,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
 import { processGeospatialData } from '@/ai/flows/process-geospatial-data';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function FileUpload({ projectId }: { projectId: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -74,11 +76,15 @@ export default function FileUpload({ projectId }: { projectId: string }) {
        toast({ variant: 'destructive', title: 'Project ID is missing' });
       return;
     }
+    if (!user) {
+       toast({ variant: 'destructive', title: 'User not authenticated' });
+       return;
+    }
 
     setIsUploading(true);
     setUploadProgress(0);
 
-    const storageRef = ref(storage, `projects/${projectId}/${file.name}`);
+    const storageRef = ref(storage, `users/${user.uid}/projects/${projectId}/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
@@ -105,6 +111,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
           const newFileDoc = await addDoc(filesCollectionRef, {
             name: file.name,
             url: downloadURL,
+            storagePath: uploadTask.snapshot.ref.fullPath,
             type: fileType,
             status: 'uploaded',
             createdAt: serverTimestamp(),
