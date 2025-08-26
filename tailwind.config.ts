@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['"Space Grotesk"', 'sans-serif'],
+        headline: ['"Space Grotesk"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -93,6 +93,18 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+    },
+    fontSize: {
+      'xs': '0.65rem',
+      'sm': '0.75rem',
+      'base': '0.875rem',
+      'lg': '1rem',
+      'xl': '1.125rem',
+      '2xl': '1.375rem',
+      '3xl': '1.75rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
+      '6xl': '4rem',
     },
   },
   plugins: [require('tailwindcss-animate')],
