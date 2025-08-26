@@ -1,31 +1,36 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check ownership
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
+    // Rules for the 'projects' collection
     match /projects/{projectId} {
-      // Allow read/list only for the owner
-      allow get: if isOwner(resource.data.ownerId);
-      allow list: if isOwner(request.query.filters[0].value);
-      
-      // Allow create if the user is setting themselves as the owner
-      allow create: if isOwner(request.resource.data.ownerId);
-      
-      // Allow update/delete for the owner
-      allow update, delete: if isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId);
+      // A user can GET a project if their UID matches the project's ownerId.
+      allow get: if request.auth.uid == resource.data.ownerId;
 
-      // Rules for sub-collections
-      match /{path=**}/files/{fileId} {
-        allow read, write, delete: if isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId);
+      // A user can LIST projects if the query is filtered by their UID.
+      // This is crucial for the dashboard view.
+      allow list: if request.auth.uid == request.query.where.ownerId;
+
+      // A user can CREATE a project if the new document's ownerId is their own UID.
+      // This is the key fix. It checks the data being sent, not existing data.
+      allow create: if request.auth.uid == request.resource.data.ownerId;
+
+      // A user can UPDATE or DELETE a project if they are the owner.
+      allow update, delete: if request.auth.uid == resource.data.ownerId;
+
+      // Rules for the 'files' sub-collection
+      match /files/{fileId} {
+        // Allow all operations if the user owns the parent project.
+        // It checks the ownership of the 'project' document.
+        allow read, write, create, delete: if request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
       }
 
-      match /{path=**}/reviews/{reviewId} {
-        allow read, write, delete: if isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId);
+      // Rules for the 'reviews' sub-collection
+      match /reviews/{reviewId} {
+        // Allow all operations if the user owns the parent project.
+        allow read, write, create, delete: if request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
       }
     }
   }
