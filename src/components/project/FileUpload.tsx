@@ -70,10 +70,10 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     
     setIsUploading(true);
     
-    const toastId = toast({
+    const { id: toastId, update } = toast({
         title: 'Uploading...',
         description: `Uploading "${file.name}".`,
-    }).id;
+    });
 
     const storageRef = ref(storage, `users/${user.uid}/projects/${projectId}/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -83,9 +83,9 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       () => {
         // Optional: update toast with progress here
       },
-      (error) => {
+      (error: any) => {
         console.error('Upload failed:', error);
-        toast({ id: toastId, variant: 'destructive', title: 'Upload Failed', description: error.message });
+        update({ id: toastId, variant: 'destructive', title: 'Upload Failed', description: error.message });
         setIsUploading(false);
       },
       async () => {
@@ -106,7 +106,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
             createdAt: serverTimestamp(),
           });
 
-          toast({
+          update({
             id: toastId,
             title: 'Upload Successful',
             description: `"${file.name}" is now being processed.`,
@@ -124,9 +124,9 @@ export default function FileUpload({ projectId }: { projectId: string }) {
             triggerGeoJsonProcessing(newFileDoc.id);
           }
 
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to update firestore', error);
-          toast({
+          update({
             id: toastId,
             variant: 'destructive',
             title: 'Database Update Failed',

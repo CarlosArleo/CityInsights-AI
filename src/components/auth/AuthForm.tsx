@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  FirebaseError
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
@@ -42,12 +41,11 @@ export default function AuthForm() {
         await signInWithEmailAndPassword(auth, email, password);
       }
       router.push('/dashboard');
-    } catch (error) {
-      const firebaseError = error as FirebaseError;
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Authentication Failed',
-        description: firebaseError.message,
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setLoading(false);
@@ -60,12 +58,11 @@ export default function AuthForm() {
     try {
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
-    } catch (error) {
-       const firebaseError = error as FirebaseError;
+    } catch (error: any) {
        toast({
         variant: 'destructive',
         title: 'Google Sign-In Failed',
-        description: firebaseError.message,
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setLoading(false);
