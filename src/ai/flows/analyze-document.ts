@@ -1,14 +1,7 @@
 
-/**
- * @fileOverview Analyzes a document to extract qualitative insights based on a predefined framework.
- *
- * - analyzeDocument - A function that handles the document analysis process.
- * - AnalyzeDocumentInput - The input type for the analyzeDocument function.
- * - KeyInsight - The structure of a single insight extracted from the document.
- */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {doc, updateDoc, collection, addDoc} from 'firebase/firestore';
+import {doc, updateDoc, collection, writeBatch} from 'firebase/firestore';
 import {db} from '@/lib/firebase/config';
 
 // Defines the structure for a single key insight found by the AI
@@ -42,14 +35,14 @@ const analysisPrompt = ai.definePrompt({
     name: 'documentAnalysisPrompt',
     input: { schema: z.object({ fileContent: z.string() }) },
     output: { schema: z.object({ keyInsights: z.array(KeyInsightSchema) }) },
-    prompt: `You are an expert urban analyst specializing in socio-spatial and equity analysis. Your task is to analyze the provided document based on the "Masterplanning for Democracy" framework.
+    prompt: `You are an expert urban analyst specializing in socio-spatial and equity analysis. Your task is to analyze the provided document based on the "Masterplanning for Democracy" framework. Your output must not exceed 20 key insights.
 
     Analyze the following document content:
     ---
     {{{fileContent}}}
     ---
 
-    Identify key excerpts that fall into one of the following categories:
+    Identify a maximum of 20 key excerpts that fall into one of the following categories:
     - **Perceptions & Mental Models:** How people perceive and mentally map spaces. Reveals biases, community views, and societal narratives. (Keywords: believe, feel, think, perceive, view, narrative, bias)
     - **Relationships & Power Dynamics:** The web of social and political interactions. Identifies who holds power, patterns of inclusion/exclusion. (Keywords: power, influence, control, access, inequality, stakeholders)
     - **Policies, Practices, & Investments:** Formal mechanisms shaping a space like laws, regulations, and resource allocation. (Keywords: policy, law, regulation, funding, investment, budget, plan, project)
@@ -79,18 +72,23 @@ export const analyzeDocumentFlow = ai.defineFlow(
     try {
         const { output } = await analysisPrompt({ fileContent });
 
-        if (output && output.keyInsights) {
+        if (output && output.keyInsights && output.keyInsights.length > 0) {
+            const batch = writeBatch(db);
             const reviewsCollectionRef = collection(db, 'projects', projectId, 'reviews');
-            for (const insight of output.keyInsights) {
-                await addDoc(reviewsCollectionRef, {
+            
+            output.keyInsights.forEach(insight => {
+                const newReviewRef = doc(reviewsCollectionRef); // Auto-generate ID
+                batch.set(newReviewRef, {
                     ...insight,
                     projectId: projectId,
                     fileId: fileId,
-                    ownerId: ownerId, // Add ownerId to the review document
+                    ownerId: ownerId,
                     status: 'pending', // 'pending', 'accepted', 'rejected'
                     createdAt: new Date().toISOString(),
                 });
-            }
+            });
+
+            await batch.commit();
         }
         
         await updateDoc(fileRef, { status: 'completed' });

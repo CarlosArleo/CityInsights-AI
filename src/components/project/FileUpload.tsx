@@ -8,7 +8,6 @@ import { db, storage } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, CheckCircle, AlertCircle } from 'lucide-react';
-import { analyzeDocumentAction, processGeospatialDataAction } from '@/app/actions';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function FileUpload({ projectId }: { projectId: string }) {
@@ -21,33 +20,6 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       handleUpload(e.target.files[0]);
     }
   };
-
-  const triggerAnalysis = async (fileId: string, fileContent: string, ownerId: string) => {
-    try {
-      await analyzeDocumentAction({ projectId, fileId, fileContent, ownerId });
-    } catch (error) {
-      console.error('Failed to trigger analysis flow:', error);
-       toast({
-        variant: 'destructive',
-        title: 'Analysis Failed',
-        description: 'Could not start the AI analysis for the document.',
-      });
-    }
-  };
-
-  const triggerGeoJsonProcessing = async (fileId: string) => {
-    try {
-        await processGeospatialDataAction({ projectId, fileId });
-    } catch (error) {
-        console.error('Failed to trigger GeoJSON processing flow:', error);
-        toast({
-            variant: 'destructive',
-            title: 'Processing Failed',
-            description: 'Could not start processing for the GeoJSON file.',
-        });
-    }
-  };
-
 
   const handleUpload = async (file: File) => {
     if (!file || !projectId || !user) {
@@ -69,7 +41,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     
     setIsUploading(true);
     
-    const { id: toastId, update } = toast({
+    const toastRef = toast({
         title: 'Uploading...',
         description: `Uploading "${file.name}".`,
     });
@@ -84,7 +56,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       },
       (error: any) => {
         console.error('Upload failed:', error);
-        update({ id: toastId, variant: 'destructive', title: 'Upload Failed', description: error.message });
+        toastRef.update({ variant: 'destructive', title: 'Upload Failed', description: error.message });
         setIsUploading(false);
       },
       async () => {
@@ -94,42 +66,30 @@ export default function FileUpload({ projectId }: { projectId: string }) {
           
           const fileType = isGeoJson ? 'geojson' : 'document';
 
-          const newFileDoc = await addDoc(filesCollectionRef, {
+          // The Cloud Function (trigger) will listen for the creation of this document.
+          await addDoc(filesCollectionRef, {
             name: file.name,
             url: downloadURL,
             storagePath: uploadTask.snapshot.ref.fullPath,
             type: fileType,
-            status: 'uploaded',
-            ownerId: user.uid, // Add ownerId to file document
+            status: 'uploaded', // The trigger will change this to 'processing'
+            ownerId: user.uid,
             projectId: projectId,
             createdAt: serverTimestamp(),
           });
 
-          update({
-            id: toastId,
+          toastRef.update({
             title: 'Upload Successful',
-            description: `"${file.name}" is now being processed.`,
+            description: `"${file.name}" has been queued for analysis.`,
             action: <CheckCircle className="text-green-500" />,
           });
 
-          if (fileType === 'document') {
-             const reader = new FileReader();
-             reader.onload = (e) => {
-               const text = e.target?.result as string;
-               triggerAnalysis(newFileDoc.id, text, user.uid);
-             };
-             reader.readAsText(file);
-          } else if (fileType === 'geojson') {
-            triggerGeoJsonProcessing(newFileDoc.id);
-          }
-
         } catch (error: any) {
-          console.error('Failed to update firestore', error);
-          update({
-            id: toastId,
+          console.error('Failed to create file metadata in Firestore', error);
+          toastRef.update({
             variant: 'destructive',
             title: 'Database Update Failed',
-            description: "File uploaded, but couldn't save its record.",
+            description: "File uploaded, but couldn't save its metadata record.",
             action: <AlertCircle className="text-yellow-500" />,
           });
         } finally {

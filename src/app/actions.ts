@@ -1,18 +1,10 @@
 
 "use server";
 
-import { analyzeDocumentFlow, AnalyzeDocumentInput } from "@/ai/flows/analyze-document";
-import { processGeospatialDataFlow, ProcessGeoJsonInput } from "@/ai/flows/process-geospatial-data";
 import { analyzeEquityRiskFlow, AnalyzeEquityRiskInput, AnalyzeEquityRiskOutput } from "@/ai/flows/equity-risk-analysis";
 
-// Create and export a Server Action for each flow
-export async function analyzeDocumentAction(input: AnalyzeDocumentInput) {
-  return await analyzeDocumentFlow(input);
-}
-
-export async function processGeospatialDataAction(input: ProcessGeoJsonInput) {
-  return await processGeospatialDataFlow(input);
-}
+// This file is now only for actions that NEED to be called directly from the client.
+// Document and GeoJSON processing are now handled by backend triggers, so their actions are removed.
 
 export async function analyzeEquityRiskAction(input: AnalyzeEquityRiskInput): Promise<AnalyzeEquityRiskOutput> {
   return await analyzeEquityRiskFlow(input);
