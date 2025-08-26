@@ -56,7 +56,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       },
       (error: any) => {
         console.error('Upload failed:', error);
-        toastRef.update({ variant: 'destructive', title: 'Upload Failed', description: error.message });
+        toastRef.update({ id: toastRef.id, variant: 'destructive', title: 'Upload Failed', description: error.message });
         setIsUploading(false);
       },
       async () => {
@@ -79,6 +79,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
           });
 
           toastRef.update({
+            id: toastRef.id,
             title: 'Upload Successful',
             description: `"${file.name}" has been queued for analysis.`,
             action: <CheckCircle className="text-green-500" />,
@@ -87,6 +88,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
         } catch (error: any) {
           console.error('Failed to create file metadata in Firestore', error);
           toastRef.update({
+            id: toastRef.id,
             variant: 'destructive',
             title: 'Database Update Failed',
             description: "File uploaded, but couldn't save its metadata record.",

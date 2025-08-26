@@ -7,7 +7,7 @@ import { db } from '@/lib/firebase/config';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { CreateProjectDialog } from './CreateProjectDialog';
+import { CreateProjectDialog } from '@/components/dashboard/CreateProjectDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText } from 'lucide-react';
 
