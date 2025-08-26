@@ -26,27 +26,29 @@ export default function StrategicAnalysis() {
     };
 
     return (
-        <div>
+        <div className="space-y-4">
            <DisparateImpactAnalysis onAnalysisComplete={handleAnalysisComplete} />
+
+           {/* Add other strategic tools here */}
 
            {analysisResult && (
             <AlertDialog open={isAlertOpen} onOpenChange={setAlertOpen}>
-              <AlertDialogContent className="bg-gray-900 text-white border-gray-700">
+              <AlertDialogContent className="bg-sidebar-background text-sidebar-foreground border-sidebar-border">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center gap-2 text-primary-foreground"><AlertTriangle className="text-accent" /> Equity Risk Analysis Report</AlertDialogTitle>
+                  <AlertDialogTitle className="flex items-center gap-2"><AlertTriangle className="text-amber-400" /> Equity Risk Analysis Report</AlertDialogTitle>
                   <AlertDialogDescription className="text-gray-400 pt-2">
                     {analysisResult.summary}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-4">
                     <div>
-                        <h3 className="font-semibold flex items-center gap-2 mb-2"><ListChecks /> Key Risks</h3>
+                        <h3 className="font-semibold flex items-center gap-2 mb-2 text-gray-200"><ListChecks /> Key Risks</h3>
                         <ul className="list-disc pl-5 space-y-1 text-sm text-gray-300">
                             {analysisResult.keyRisks.map((risk, i) => <li key={i}>{risk}</li>)}
                         </ul>
                     </div>
                     <div>
-                        <h3 className="font-semibold flex items-center gap-2 mb-2"><ThumbsUp /> Recommendations</h3>
+                        <h3 className="font-semibold flex items-center gap-2 mb-2 text-gray-200"><ThumbsUp /> Recommendations</h3>
                         <ul className="list-disc pl-5 space-y-1 text-sm text-gray-300">
                             {analysisResult.recommendations.map((rec, i) => <li key={i}>{rec}</li>)}
                         </ul>

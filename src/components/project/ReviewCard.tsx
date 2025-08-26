@@ -3,7 +3,6 @@
 
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -43,38 +42,37 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         description: 'Could not update the insight status.',
       });
     } finally {
-        // No need to set isUpdating back to false, as the component will disappear
+        // Component will disappear, no need to setIsUpdating(false)
     }
   };
 
   return (
-    <Card className="bg-black/20 border-gray-700 text-white">
-      <CardHeader className="p-4">
-        <Badge variant="secondary" className="w-fit">{review.category}</Badge>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-3">
-        <p className="text-sm text-gray-300 italic">"{review.excerpt}"</p>
-        <p className="font-semibold text-primary-foreground">{review.insight}</p>
-      </CardContent>
-      <CardFooter className="p-4 flex justify-end gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
-          onClick={() => handleUpdateStatus('rejected')}
-          disabled={isUpdating}
-        >
-          <X className="mr-1 h-4 w-4" /> Reject
-        </Button>
-        <Button
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white"
-          onClick={() => handleUpdateStatus('accepted')}
-          disabled={isUpdating}
-        >
-          <Check className="mr-1 h-4 w-4" /> Accept
-        </Button>
-      </CardFooter>
-    </Card>
+    <div className="bg-black/20 p-3 rounded-md border border-sidebar-border/50 text-sm">
+      <p className="text-gray-400 italic mb-2">"{review.excerpt}"</p>
+      <p className="font-semibold text-gray-200 mb-3">{review.insight}</p>
+      <div className="flex justify-between items-center">
+        <Badge variant="secondary" className="bg-gray-600/50 text-gray-300">{review.category}</Badge>
+        <div className="flex gap-2">
+            <Button
+            size="icon"
+            variant="ghost"
+            className="text-red-400 hover:bg-red-900/50 hover:text-red-300 h-7 w-7"
+            onClick={() => handleUpdateStatus('rejected')}
+            disabled={isUpdating}
+            >
+            <X className="h-4 w-4" />
+            </Button>
+            <Button
+            size="icon"
+            variant="ghost"
+            className="text-green-400 hover:bg-green-900/50 hover:text-green-300 h-7 w-7"
+            onClick={() => handleUpdateStatus('accepted')}
+            disabled={isUpdating}
+            >
+            <Check className="h-4 w-4" />
+            </Button>
+        </div>
+      </div>
+    </div>
   );
 }

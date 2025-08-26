@@ -18,7 +18,7 @@ export default function ProjectPage({ params }: ProjectPageParams) {
   return (
     <ProtectedRoute>
       <MapProvider>
-        <div className="relative h-screen w-screen bg-gray-900">
+        <div className="relative h-screen w-screen bg-gray-900 overflow-hidden">
           <MapComponent />
           <ControlSidebar projectId={projectId} />
         </div>

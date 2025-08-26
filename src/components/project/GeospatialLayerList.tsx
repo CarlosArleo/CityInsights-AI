@@ -53,16 +53,14 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
   if (loading) {
     return (
       <div className="space-y-2">
-        <Skeleton className="h-8 w-full bg-gray-700" />
+        <Skeleton className="h-8 w-full bg-gray-700/50" />
       </div>
     );
   }
 
   if (files.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-5 border-2 border-dashed border-gray-600 rounded-lg">
-        <p className="mt-2 text-sm text-gray-400">No geospatial layers.</p>
-      </div>
+       <p className="text-sm text-gray-400 px-2 py-4 text-center">No map layers uploaded.</p>
     );
   }
 
@@ -73,15 +71,15 @@ export default function GeospatialLayerList({ projectId }: GeospatialLayerListPr
         const color = layerColors[index % layerColors.length];
         
         return (
-          <div key={file.id} className="flex items-center gap-3">
+          <div key={file.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5">
             <Checkbox
               id={`layer-${file.id}`}
               checked={isVisible}
               onCheckedChange={() => toggleLayer(file.id, file.url, color)}
               className="border-gray-500 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
-            <Label htmlFor={`layer-${file.id}`} className="flex items-center gap-2 cursor-pointer text-sm">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+            <Label htmlFor={`layer-${file.id}`} className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+              <div className="w-4 h-4 rounded-sm border border-white/50" style={{ backgroundColor: color }} />
               <span>{file.name}</span>
             </Label>
           </div>
