@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
@@ -27,6 +29,7 @@ export function CreateProjectDialog({ userId }: CreateProjectDialogProps) {
   const [projectName, setProjectName] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleCreateProject = async () => {
     if (!projectName.trim()) {
@@ -38,11 +41,11 @@ export function CreateProjectDialog({ userId }: CreateProjectDialogProps) {
     }
     setLoading(true);
     try {
-      await addDoc(collection(db, 'projects'), {
+      const docRef = await addDoc(collection(db, 'projects'), {
         ownerId: userId,
         name: projectName,
         createdAt: serverTimestamp(),
-        fileCount: 0, // Ensure fileCount is initialized
+        fileCount: 0,
       });
       toast({
         title: 'Project Created',
@@ -50,6 +53,7 @@ export function CreateProjectDialog({ userId }: CreateProjectDialogProps) {
       });
       setProjectName('');
       setOpen(false);
+      router.push(`/project/${docRef.id}`); // Navigate to the new project page
     } catch (error) {
       console.error('Error creating project:', error);
       toast({
