@@ -32,7 +32,11 @@ export default function ProjectList() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const projectsData: Project[] = [];
       querySnapshot.forEach((doc) => {
-        projectsData.push({ id: doc.id, ...doc.data() } as Project);
+        const data = doc.data();
+        // Ensure createdAt is not null before pushing
+        if (data.createdAt) {
+          projectsData.push({ id: doc.id, ...data } as Project);
+        }
       });
       setProjects(projectsData.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()));
       setLoading(false);
@@ -80,7 +84,7 @@ export default function ProjectList() {
                 <CardHeader className="flex-grow">
                   <CardTitle className="text-primary">{project.name}</CardTitle>
                   <CardDescription>
-                    Created on {project.createdAt.toDate().toLocaleDateString()}
+                    {project.createdAt ? `Created on ${project.createdAt.toDate().toLocaleDateString()}` : 'Date not available'}
                   </CardDescription>
                 </CardHeader>
                 <CardFooter>
