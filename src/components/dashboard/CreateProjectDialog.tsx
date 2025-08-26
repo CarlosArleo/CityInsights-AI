@@ -42,7 +42,7 @@ export function CreateProjectDialog({ userId }: CreateProjectDialogProps) {
         ownerId: userId,
         name: projectName,
         createdAt: serverTimestamp(),
-        fileCount: 0,
+        fileCount: 0, // Ensure fileCount is initialized
       });
       toast({
         title: 'Project Created',
