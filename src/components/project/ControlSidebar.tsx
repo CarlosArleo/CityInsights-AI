@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
-import { Skeleton } from '@/components/ui/skeleton';
 import FileUpload from '@/components/project/FileUpload';
 import DocumentList from '@/components/project/DocumentList';
 import GeospatialLayerList from './GeospatialLayerList';

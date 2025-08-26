@@ -10,7 +10,7 @@
  */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {doc, updateDoc, collection, addDoc, getDoc} from 'firebase/firestore';
+import {doc, updateDoc, collection, addDoc} from 'firebase/firestore';
 import {db} from '@/lib/firebase/config';
 
 // Defines the structure for a single key insight found by the AI

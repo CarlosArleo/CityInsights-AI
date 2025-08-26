@@ -48,7 +48,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
 
   return (
     <div className="bg-black/20 p-3 rounded-md border border-sidebar-border/50 text-sm">
-      <p className="text-gray-400 italic mb-2">"{review.excerpt}"</p>
+      <p className="text-gray-400 italic mb-2">&quot;{review.excerpt}&quot;</p>
       <p className="font-semibold text-gray-200 mb-3">{review.insight}</p>
       <div className="flex justify-between items-center">
         <Badge variant="secondary" className="bg-gray-600/50 text-gray-300">{review.category}</Badge>

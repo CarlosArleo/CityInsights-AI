@@ -80,7 +80,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
 
     uploadTask.on(
       'state_changed',
-      (snapshot) => {
+      () => {
         // Optional: update toast with progress here
       },
       (error) => {
