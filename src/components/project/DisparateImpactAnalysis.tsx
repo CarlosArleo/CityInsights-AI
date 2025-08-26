@@ -62,7 +62,7 @@ export default function DisparateImpactAnalysis({ onAnalysisComplete }: Disparat
         <Card className="bg-transparent border-gray-700 text-white">
             <CardHeader className="p-4">
                 <CardTitle className="text-md flex items-center gap-2"><Lightbulb className="text-accent"/> Disparate Impact Identification</CardTitle>
-                <CardDescription className="text-gray-400">Analyze a proposed policy to identify potential equity risks based on your project's curated data.</CardDescription>
+                <CardDescription className="text-gray-400">Analyze a proposed policy to identify potential equity risks based on your project&apos;s curated data.</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0">
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -73,7 +73,7 @@ export default function DisparateImpactAnalysis({ onAnalysisComplete }: Disparat
                         <DialogHeader>
                         <DialogTitle>New Disparate Impact Analysis</DialogTitle>
                         <DialogDescription>
-                            Enter the text of a proposed policy or plan. The AI will analyze it using your project's accepted insights and geospatial data as context.
+                            Enter the text of a proposed policy or plan. The AI will analyze it using your project&apos;s accepted insights and geospatial data as context.
                         </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">

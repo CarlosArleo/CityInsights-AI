@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  GithubAuthProvider,
+  FirebaseError
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
@@ -42,11 +42,12 @@ export default function AuthForm() {
         await signInWithEmailAndPassword(auth, email, password);
       }
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
+      const firebaseError = error as FirebaseError;
       toast({
         variant: 'destructive',
         title: 'Authentication Failed',
-        description: error.message,
+        description: firebaseError.message,
       });
     } finally {
       setLoading(false);
@@ -59,11 +60,12 @@ export default function AuthForm() {
     try {
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
+       const firebaseError = error as FirebaseError;
        toast({
         variant: 'destructive',
         title: 'Google Sign-In Failed',
-        description: error.message,
+        description: firebaseError.message,
       });
     } finally {
       setLoading(false);

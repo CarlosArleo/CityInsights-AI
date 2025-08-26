@@ -1,11 +1,10 @@
 
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import FileUpload from '@/components/project/FileUpload';
 import DocumentList from '@/components/project/DocumentList';
 import GeospatialLayerList from './GeospatialLayerList';
-import { Separator } from '../ui/separator';
 
 interface DataManagementProps {
     projectId: string;
