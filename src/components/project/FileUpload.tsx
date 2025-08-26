@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -20,12 +21,16 @@ export default function FileUpload({ projectId }: { projectId: string }) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
-       const allowedTypes = ['application/pdf', 'text/plain', 'text/markdown'];
-      if (!allowedTypes.includes(selectedFile.type)) {
+       const allowedTypes = ['application/pdf', 'text/plain', 'text/markdown', 'application/json'];
+      
+      // A simple check for geojson file extension
+      const isGeoJson = selectedFile.name.toLowerCase().endsWith('.geojson');
+
+      if (!allowedTypes.includes(selectedFile.type) && !isGeoJson) {
         toast({
           variant: 'destructive',
           title: 'Invalid File Type',
-          description: 'Please upload a .pdf, .txt, or .md file.',
+          description: 'Please upload a .pdf, .txt, .md, or .geojson file.',
         });
         return;
       }
@@ -75,10 +80,16 @@ export default function FileUpload({ projectId }: { projectId: string }) {
         try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
             const projectDocRef = doc(db, 'projects', projectId);
+            
+            const isGeoJson = file.name.toLowerCase().endsWith('.geojson');
+            const fileType = isGeoJson ? 'geojson' : file.type;
+
             await updateDoc(projectDocRef, {
                 files: arrayUnion({
                     name: file.name,
                     url: downloadURL,
+                    type: fileType,
+                    status: 'uploaded',
                     uploadedAt: new Date().toISOString(),
                 }),
                 fileCount: increment(1)
@@ -109,13 +120,13 @@ export default function FileUpload({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="file-upload">Choose a file</Label>
-        <Input id="file-upload" type="file" onChange={handleFileChange} disabled={isUploading} accept=".pdf,.txt,.md" />
+        <Label htmlFor="file-upload" className="text-sm font-medium text-gray-300">Choose a file</Label>
+        <Input id="file-upload" type="file" onChange={handleFileChange} disabled={isUploading} accept=".pdf,.txt,.md,.geojson" className="text-white file:text-white" />
       </div>
       
       {isUploading && <Progress value={uploadProgress} className="w-full" />}
       
-      <Button onClick={handleUpload} disabled={!file || isUploading} className="w-full">
+      <Button onClick={handleUpload} disabled={!file || isUploading} className="w-full bg-primary hover:bg-primary/90 text-white">
         {isUploading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (

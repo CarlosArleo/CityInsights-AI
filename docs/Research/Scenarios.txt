@@ -1,0 +1,60 @@
+Scenarios
+
+A comprehensive, end-to-end scenario that demonstrates the entire logic of the application, from initial data ingestion to the final strategic proposal. This will illustrate how the AI acts as a powerful extension of our own methodology.
+
+Scenario: The "Northside Corridor" Rezoning Proposal
+The Context:A city proposes a major upzoning of a historically working-class, mixed-income industrial corridor. The official plan promises "revitalization," "new housing," and "economic growth." A coalition of community groups is concerned about displacement, loss of cultural identity, and the affordability of the new housing. They hire us, the practitioners of the "Masterplanning for Democracy" framework, to conduct an independent analysis and propose an alternative, more equitable masterplan.
+Our Traditional Workflow (Without the AI):
+* Months of manually reading hundreds of documents (city plans, census data, academic studies, news articles).
+* Dozens of hours transcribing and manually coding interviews and community meeting notes.
+* Separate, disconnected GIS analysis of demographic and zoning data.
+* A final, static report that is time-consuming to produce and difficult for stakeholders to query or interact with.
+Our New Workflow (With the Democratic Masterplanning AI Platform):
+
+Phase 1: Building the Foundational Context (Using the MVP)
+Step 1: Project Ingestion & AI-Assisted Coding (QDE)
+* Action:We create a new project, "Northside Corridor Analysis." We upload a corpus of 50 documents: the city's 300-page proposal, historical planning documents, transcripts from three public hearings, 15 local news articles about gentrification, and census data reports.
+* AI in Action:TheanalyzeDocumentflow runs in the background. Within an hour, it has performed a "first pass" analysis, creating 750 initial "review cards" in oursocioSpatialPhenomenacollection.
+* Our Practice in Action:Our junior analysts don't spend weeks coding from scratch. Instead, they spend two days in theHuman-in-the-Loop (HITL) interface. They rapidly review the AI's suggestions.
+o They"Accept"a card tagging an excerpt from a resident's testimony about rising rents as "Perceptions & Mental Models."
+o They"Reject"a card that misinterprets a technical zoning term.
+o They"Modify"a tag from "Policies" to "Power Dynamics" when an excerpt revealswhobenefits from a specific policy.
+* Data-Driven Insight (Early Stage):We now have a rigorously coded, consistent, and auditable qualitative database. We can instantly query all 45 accepted excerpts related to "Power Dynamics," revealing a consistent narrative that local small business owners feel excluded from the planning process.
+
+Phase 2: Synthesizing the Socio-Spatial Reality
+Step 2: Geospatial Analysis & Correlation (GIM)
+* Action:We go to the "Geospatial Analysis" tab. We upload three.geojsonfiles: current zoning, locations of cultural heritage sites, and census tracts color-coded by renter-occupied housing density.
+* AI in Action:While not a direct AI action, the platform now holds both the "what" (qualitative themes) and the "where" (spatial data).
+* Our Practice in Action:We overlay the layers. We can now visually correlate the data.
+* Data-Driven Insight (Synthesis):We immediately see a powerful spatial correlation: the highest density of "community displacement concerns" (a theme from the QDE) directly overlaps with census tracts that have over 80% renter-occupied housing and are adjacent to the proposed new high-density zoning.The map makes the abstract fear of displacement geographically specific and tangible.
+Step 3: Proactive Risk Assessment (DIIS)
+* Action:We open the "Analyze Policy Impact" modal. We paste in the core proposal from the city's plan:"Rezone the Northside Corridor for high-density, market-rate housing to spur economic growth."We click "Generate Analysis."
+* AI in Action:ThepredictDisparateImpactflow runs. It synthesizes the context we just built:
+1. It reads all the"accepted"excerpts about community fears and power imbalances.
+2. It reads thegeospatial datashowing the high concentration of renters.
+3. It analyzes the policy text against this context, guided by our framework's principles.
+* Our Practice in Action:We receive the AI-generated report.
+* Data-Driven Insight (Prediction):The report is clear and direct:
+"High Risk of Secondary Displacement:The proposed policy, when analyzed against the project's context, shows a high probability of increasing housing cost burdens for low-income renters in adjacent neighborhoods. This would negatively impact theShared Value Dimension of Economic Justiceand conflict withSDG 10: Reduced Inequalities. The concentration of renter-occupied housing in these areas makes them highly vulnerable to market pressures created by the new development."
+
+Phase 3: Forging the Alternative Masterplan
+Step 4: Generating Strategic Alternatives (Roadmap Generation Module)
+* Action:We are now armed with a deep, data-driven understanding of the problem. We click "Generate Strategic Roadmap."
+* AI in Action:The AI processes all the previous outputs: the key qualitative themes, the spatial correlations, and the DIIS risk report. It generates a list of potential interventions, structured by our own theory of change.
+* Our Practice in Action:We review the AI-generated roadmap. It's not the final plan, but it's a brilliant, structured starting point for our strategic workshop.
+* Data-Driven Proposal (Generation):The AI proposes:
+o A Pedagogy Intervention:"Launch community workshops to educate renters on their rights and the potential impacts of the zoning change."
+o A Process Intervention:"Establish a formal community benefits agreement process, giving residents a direct say in the allocation of public amenity funds."
+o A Practice Intervention:"Pilot a community land trust on a portion of the rezoned land to ensure long-term housing affordability."
+Step 5: Simulating and Communicating the Better Future
+* Action:We use the'SharedValue Matrix' Simulatorto compare the city's original plan against our new, AI-assisted alternative.
+o Scenario A:"Market-rate only development."
+o Scenario B:"Mixed-use development with a community land trust and 30% affordable housing."
+* AI in Action:The simulator runs both scenarios through the DIIS engine.
+* Our Practice in Action:We now have a powerful, comparative, data-driven argument. We then use theContent Generation & Synthesis Engine (CGSE).
+* Data-Driven Communication (The Final Output):We click "Generate Executive Summary." The AI produces a draft report that we can take directly to the city council. It includes:
+o A map showing the spatial risk of displacement.
+o A chart comparing the predicted "Economic Justice" scores of the two scenarios.
+o A clear, structured proposal for our alternative masterplan, grounded in the framework's principles and backed by all the analysis conducted.
+Conclusion:
+For our practice, the AI platform is not a replacement for our expertise; it is anamplificationof it. It automates our most laborious tasks, enforces the rigor of our framework at scale, and unlocks new forms of inquiry that were previously impossible. It allows us to move faster, see deeper, and build more compelling, data-driven arguments for the equitable and just cities our framework envisions. We are no longer just presenting a philosophy; we are deploying an operational system for achieving it.

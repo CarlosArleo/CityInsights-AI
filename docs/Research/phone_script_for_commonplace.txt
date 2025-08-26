@@ -1,0 +1,38 @@
+
+**Objective:** To make initial contact, express interest in the company, and identify the correct person to speak with for a more detailed conversation about your work and the AI application.
+
+**Caller:** You (Carlos Enrique Arleo)
+
+**Target Company:** Commonplace
+
+---
+
+### **The Script**
+
+**(Opening)**
+
+"Good morning/afternoon. My name is Carlos Enrique Arleo, and I'm calling from Newcastle. Could you possibly help me? I'm trying to find the best person to speak with regarding innovation and new digital tools at Commonplace."
+
+*(Pause and wait for their response. They might ask for more details.)*
+
+**If they ask "What is this regarding?":**
+
+"Of course. I'm an architect and urban researcher, and my work focuses on regenerative design and development. I've been following Commonplace's work for some time and I'm very impressed with your approach to community engagement and urban planning.
+
+In my recent PhD research, I developed a framework for more equitable design, and I've now built a functional AI platform that operationalizes it. It's a tool designed to help practices like yours analyze project documents and predict the equity impacts of urban plans much more effectively.
+
+I believe it aligns very well with your mission, and I'm hoping to connect with the person who handles your digital practice, R&D, or strategic innovation to briefly share what I've built. Would you know who the best contact for that might be?"
+
+**Possible Endings:**
+
+*   **If they give you a name/email:** "That's fantastic, thank you so much for your help. I'll reach out to [Name] directly. I appreciate your time."
+*   **If they offer to take a message:** "That would be wonderful, thank you. Again, my name is Carlos Enrique Arleo. My work is at the intersection of regenerative design and AI. Could you please ask [Name] to expect an email from me with a brief, 5-minute video demonstration of the tool? I'm very grateful for your assistance."
+*   **If they say they don't know/can't help:** "I understand, thank you for checking for me. Is there a general 'info' or 'partnerships' email address I could send a brief proposal to? Thank you again for your time."
+
+---
+**Key Points to Remember:**
+
+*   **Be Confident:** You are not asking for a favor; you are offering potential value.
+*   **Be Concise:** Keep it under 60 seconds if possible.
+*   **The Goal is the Next Step:** The only goal of this call is to find the right contact person. Don't try to explain the entire application on this first call.
+*   **Have an Email Ready:** Have the email with the Loom video link (as mentioned in the job-seeking strategy) ready to send the moment you hang up.
