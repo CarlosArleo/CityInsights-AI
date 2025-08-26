@@ -46,9 +46,11 @@ export default function ProjectPage({ params }: ProjectPageParams) {
   return (
     <ProtectedRoute>
       <div className="flex h-screen w-full flex-col">
-        <Header />
+        {/* The header is part of the overall page layout, not the map area */}
+        <Header /> 
         <main className="relative flex-1">
-          <div className="relative h-full w-full">
+          {/* The main content area now uses absolute positioning for layering */}
+          <div className="absolute inset-0">
             <MapComponent />
             <ControlSidebar project={project} projectId={projectId} loading={loading} />
           </div>
