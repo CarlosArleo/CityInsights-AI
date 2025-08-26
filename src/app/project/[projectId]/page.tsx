@@ -2,12 +2,9 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ProjectWorkspace from '@/components/project/ProjectWorkspace';
 import { MapProvider } from '@/context/MapContext';
 
-// Correctly type the props for a dynamic Next.js page
-interface ProjectPageProps {
-  params: { projectId: string };
-}
-
-export default function ProjectPage({ params }: ProjectPageProps) {
+// This is a Server Component, so its props are passed directly by Next.js.
+// We define the shape of the `params` object it will receive.
+export default function ProjectPage({ params }: { params: { projectId: string } }) {
   const { projectId } = params;
 
   return (
