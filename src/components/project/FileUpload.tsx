@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { analyzeDocument } from '@/ai/flows/analyze-document';
+import { processGeospatialData } from '@/ai/flows/process-geospatial-data';
 
 export default function FileUpload({ projectId }: { projectId: string }) {
   const [file, setFile] = useState<File | null>(null);
@@ -23,7 +24,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
       const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
-      const isGeoJson = selectedFile.name.toLowerCase().endsWith('.geojson');
+      const isGeoJson = selectedFile.type === 'application/geo+json' || selectedFile.name.toLowerCase().endsWith('.geojson');
 
       if (!allowedTextTypes.includes(selectedFile.type) && !isGeoJson) {
         toast({
@@ -42,8 +43,6 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       await analyzeDocument({ projectId, fileId, fileContent });
     } catch (error) {
       console.error('Failed to trigger analysis flow:', error);
-      // Even if the flow fails to start, the file is uploaded.
-      // The status will be handled within the flow itself.
        toast({
         variant: 'destructive',
         title: 'Analysis Failed',
@@ -51,6 +50,20 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       });
     }
   };
+
+  const triggerGeoJsonProcessing = async (fileId: string) => {
+    try {
+        await processGeospatialData({ projectId, fileId });
+    } catch (error) {
+        console.error('Failed to trigger GeoJSON processing flow:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Processing Failed',
+            description: 'Could not start processing for the GeoJSON file.',
+        });
+    }
+  };
+
 
   const handleUpload = async () => {
     if (!file) {
@@ -68,6 +81,9 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     const storageRef = ref(storage, `projects/${projectId}/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
+    const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
+    const isGeoJson = file.type === 'application/geo+json' || file.name.toLowerCase().endsWith('.geojson');
+
     uploadTask.on(
       'state_changed',
       (snapshot) => {
@@ -84,7 +100,6 @@ export default function FileUpload({ projectId }: { projectId: string }) {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           const filesCollectionRef = collection(db, 'projects', projectId, 'files');
           
-          const isGeoJson = file.name.toLowerCase().endsWith('.geojson');
           const fileType = isGeoJson ? 'geojson' : file.type;
 
           const newFileDoc = await addDoc(filesCollectionRef, {
@@ -98,11 +113,10 @@ export default function FileUpload({ projectId }: { projectId: string }) {
 
           toast({
             title: 'Upload Successful',
-            description: `"${file.name}" has been uploaded.`,
+            description: `"${file.name}" has been uploaded and is now being processed.`,
             action: <CheckCircle className="text-green-500" />,
           });
 
-          // If it's a text document, trigger the analysis flow
           if (allowedTextTypes.includes(file.type)) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -110,6 +124,8 @@ export default function FileUpload({ projectId }: { projectId: string }) {
               triggerAnalysis(newFileDoc.id, text);
             };
             reader.readAsText(file);
+          } else if (isGeoJson) {
+            triggerGeoJsonProcessing(newFileDoc.id);
           }
 
         } catch (error) {
@@ -124,13 +140,13 @@ export default function FileUpload({ projectId }: { projectId: string }) {
           setIsUploading(false);
           setFile(null);
           setUploadProgress(0);
+          // Clear the file input visually
+          const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+          if (fileInput) fileInput.value = '';
         }
       }
     );
   };
-
-    const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
-
 
   return (
     <div className="space-y-4">
