@@ -1,27 +1,22 @@
 
-'use client';
-
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import ControlSidebar from '@/components/project/ControlSidebar';
-import MapComponent from '@/components/project/MapComponent';
+import ProjectWorkspace from '@/components/project/ProjectWorkspace';
 import { MapProvider } from '@/context/MapContext';
 
-interface ProjectPageParams {
+interface ProjectPageProps {
   params: {
     projectId: string;
   };
 }
 
-export default function ProjectPage({ params }: ProjectPageParams) {
+// This is now a Server Component
+export default function ProjectPage({ params }: ProjectPageProps) {
   const { projectId } = params;
 
   return (
     <ProtectedRoute>
       <MapProvider>
-        <div className="relative h-screen w-screen bg-gray-900 overflow-hidden">
-          <MapComponent />
-          <ControlSidebar projectId={projectId} />
-        </div>
+        <ProjectWorkspace projectId={projectId} />
       </MapProvider>
     </ProtectedRoute>
   );
