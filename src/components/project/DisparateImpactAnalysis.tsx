@@ -16,7 +16,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Lightbulb, Loader2, Plus } from 'lucide-react';
-import { analyzeEquityRisk, AnalyzeEquityRiskOutput } from '@/ai/flows/equity-risk-analysis';
+import { analyzeEquityRiskAction } from '@/app/actions';
+import { type AnalyzeEquityRiskOutput } from '@/ai/flows/equity-risk-analysis';
 import { useParams } from 'next/navigation';
 
 interface DisparateImpactAnalysisProps {
@@ -40,7 +41,7 @@ export default function DisparateImpactAnalysis({ onAnalysisComplete }: Disparat
     }
     setLoading(true);
     try {
-      const result = await analyzeEquityRisk({ projectId, policyText });
+      const result = await analyzeEquityRiskAction({ projectId, policyText });
       onAnalysisComplete(result);
       setDialogOpen(false);
       setPolicyText('');

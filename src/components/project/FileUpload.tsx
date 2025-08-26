@@ -8,8 +8,7 @@ import { db, storage } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, CheckCircle, AlertCircle } from 'lucide-react';
-import { analyzeDocument } from '@/ai/flows/analyze-document';
-import { processGeospatialData } from '@/ai/flows/process-geospatial-data';
+import { analyzeDocumentAction, processGeospatialDataAction } from '@/app/actions';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function FileUpload({ projectId }: { projectId: string }) {
@@ -25,7 +24,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
 
   const triggerAnalysis = async (fileId: string, fileContent: string, ownerId: string) => {
     try {
-      await analyzeDocument({ projectId, fileId, fileContent, ownerId });
+      await analyzeDocumentAction({ projectId, fileId, fileContent, ownerId });
     } catch (error) {
       console.error('Failed to trigger analysis flow:', error);
        toast({
@@ -38,7 +37,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
 
   const triggerGeoJsonProcessing = async (fileId: string) => {
     try {
-        await processGeospatialData({ projectId, fileId });
+        await processGeospatialDataAction({ projectId, fileId });
     } catch (error) {
         console.error('Failed to trigger GeoJSON processing flow:', error);
         toast({
