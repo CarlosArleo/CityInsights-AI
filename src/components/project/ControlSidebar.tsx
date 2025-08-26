@@ -1,6 +1,9 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import FileUpload from '@/components/project/FileUpload';
@@ -13,12 +16,32 @@ interface Project {
 }
 
 interface ControlSidebarProps {
-  project: Project | null;
   projectId: string;
-  loading: boolean;
 }
 
-export default function ControlSidebar({ project, projectId, loading }: ControlSidebarProps) {
+export default function ControlSidebar({ projectId }: ControlSidebarProps) {
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!projectId) return;
+    setLoading(true);
+    const docRef = doc(db, 'projects', projectId);
+
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setProject(docSnap.data() as Project);
+      } else {
+        console.log("No such document!");
+        setProject(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [projectId]);
+
+
   return (
     <div className="absolute top-0 left-0 z-10 w-96 h-full bg-gray-900/80 backdrop-blur-sm overflow-y-auto text-white shadow-2xl">
       <div className="p-4">

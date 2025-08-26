@@ -1,18 +1,10 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Header from '@/components/layout/Header';
-import { Skeleton } from '@/components/ui/skeleton';
 import ControlSidebar from '@/components/project/ControlSidebar';
 import MapComponent from '@/components/project/MapComponent';
-
-interface Project {
-  name: string;
-}
 
 interface ProjectPageParams {
   params: {
@@ -22,38 +14,16 @@ interface ProjectPageParams {
 
 export default function ProjectPage({ params }: ProjectPageParams) {
   const { projectId } = params;
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!projectId) return;
-    setLoading(true);
-    const docRef = doc(db, 'projects', projectId);
-
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setProject(docSnap.data() as Project);
-      } else {
-        console.log("No such document!");
-        setProject(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [projectId]);
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen w-full flex-col">
-        {/* The header is part of the overall page layout, not the map area */}
-        <Header /> 
+      <div className="flex h-screen w-full flex-col bg-background">
+        <Header />
         <main className="relative flex-1">
-          {/* The main content area now uses absolute positioning for layering */}
-          <div className="absolute inset-0">
-            <MapComponent />
-            <ControlSidebar project={project} projectId={projectId} loading={loading} />
-          </div>
+          {/* The MapComponent and ControlSidebar are sibling components,
+              allowing for a clean, layered layout without complex nesting. */}
+          <MapComponent />
+          <ControlSidebar projectId={projectId} />
         </main>
       </div>
     </ProtectedRoute>
