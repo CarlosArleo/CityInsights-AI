@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
@@ -27,18 +28,21 @@ export default function ProjectList() {
     if (!user) return;
 
     setLoading(true);
-    const q = query(collection(db, 'projects'), where('userId', '==', user.uid));
+    const q = query(
+      collection(db, 'projects'), 
+      where('userId', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    );
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const projectsData: Project[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        // Ensure createdAt is not null before pushing
         if (data.createdAt) {
           projectsData.push({ id: doc.id, ...data } as Project);
         }
       });
-      setProjects(projectsData.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()));
+      setProjects(projectsData);
       setLoading(false);
     });
 
