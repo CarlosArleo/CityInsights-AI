@@ -2,11 +2,13 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ProjectWorkspace from '@/components/project/ProjectWorkspace';
 import { MapProvider } from '@/context/MapContext';
 
-export default function ProjectPage() {
+// This page now correctly receives the dynamic projectId from the URL
+export default function ProjectPage({ params }: { params: { projectId: string } }) {
   return (
     <ProtectedRoute>
       <MapProvider>
-        <ProjectWorkspace />
+        {/* The projectId is passed down as a prop for stability */}
+        <ProjectWorkspace projectId={params.projectId} />
       </MapProvider>
     </ProtectedRoute>
   );

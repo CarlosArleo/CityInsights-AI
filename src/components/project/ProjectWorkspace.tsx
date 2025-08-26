@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useParams } from 'next/navigation';
 import ControlSidebar from '@/components/project/ControlSidebar';
 import MapComponent from '@/components/project/MapComponent';
 import { useEffect, useState } from 'react';
@@ -9,8 +8,12 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Loader2 } from 'lucide-react';
 
-export default function ProjectWorkspace() {
-  const { projectId } = useParams() as { projectId: string };
+// The component now accepts projectId as a prop instead of using useParams
+interface ProjectWorkspaceProps {
+  projectId: string;
+}
+
+export default function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
