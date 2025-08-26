@@ -2,3 +2,6 @@
 import './flows/analyze-document';
 import './flows/process-geospatial-data';
 import './flows/equity-risk-analysis';
+
+// Import triggers to start them
+import './triggers';

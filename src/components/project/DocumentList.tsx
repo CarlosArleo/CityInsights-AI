@@ -40,10 +40,10 @@ export default function DocumentList({ projectId }: DocumentListProps) {
     if (!projectId) return;
 
     setLoading(true);
+    // Correctly query for documents of type 'document'
     const filesQuery = query(
       collection(db, 'projects', projectId, 'files'),
-      where('type', '!=', 'geojson'),
-      orderBy('type'),
+      where('type', '==', 'document'),
       orderBy('createdAt', 'desc')
     );
 
@@ -54,6 +54,9 @@ export default function DocumentList({ projectId }: DocumentListProps) {
       });
       setFiles(filesData);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching documents:", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();
