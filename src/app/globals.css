@@ -13,7 +13,7 @@ body {
     --background: 224 71.4% 4.1%; /* Dark Blue-Gray like Kepler */
     --foreground: 210 20% 98%; /* Almost White */
     
-    --card: 224 71.4% 4.1%;
+    --card: 224 71.4% 4.1% / 0.9;
     --card-foreground: 210 20% 98%;
 
     --popover: 224 71.4% 4.1%;
@@ -54,7 +54,7 @@ body {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
     
-    --card: 224 71.4% 4.1%;
+    --card: 224 71.4% 4.1% / 0.9;
     --card-foreground: 210 20% 98%;
 
     --popover: 224 71.4% 4.1%;
