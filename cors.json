@@ -1,0 +1,11 @@
+[
+  {
+    "origin": ["https://*.cloudworkstations.dev"],
+    "method": ["POST", "GET", "PUT", "HEAD"],
+    "responseHeader": [
+      "Content-Type",
+      "x-goog-resumable"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
