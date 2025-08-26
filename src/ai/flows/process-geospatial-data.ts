@@ -1,6 +1,4 @@
 
-'use server';
-
 /**
  * @fileOverview Processes an uploaded GeoJSON file.
  * This flow simply updates the file status to "completed" to provide user feedback.

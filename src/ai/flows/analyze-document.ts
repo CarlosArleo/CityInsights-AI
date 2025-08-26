@@ -1,6 +1,4 @@
 
-'use server';
-
 /**
  * @fileOverview Analyzes a document to extract qualitative insights based on a predefined framework.
  *

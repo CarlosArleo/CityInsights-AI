@@ -1,6 +1,4 @@
 
-'use server';
-
 /**
  * @fileOverview Analyzes a proposed policy for disparate impact risks.
  * - analyzeEquityRisk - A function that handles the equity risk analysis process.
