@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc, arrayUnion, increment } from 'firebase/firestore';
+import { doc, updateDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { analyzeDocument } from '@/ai/flows/analyze-document';
 
 export default function FileUpload({ projectId }: { projectId: string }) {
   const [file, setFile] = useState<File | null>(null);
@@ -21,12 +22,10 @@ export default function FileUpload({ projectId }: { projectId: string }) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
-       const allowedTypes = ['application/pdf', 'text/plain', 'text/markdown', 'application/json'];
-      
-      // A simple check for geojson file extension
+      const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
       const isGeoJson = selectedFile.name.toLowerCase().endsWith('.geojson');
 
-      if (!allowedTypes.includes(selectedFile.type) && !isGeoJson) {
+      if (!allowedTextTypes.includes(selectedFile.type) && !isGeoJson) {
         toast({
           variant: 'destructive',
           title: 'Invalid File Type',
@@ -38,20 +37,28 @@ export default function FileUpload({ projectId }: { projectId: string }) {
     }
   };
 
+  const triggerAnalysis = async (fileId: string, fileContent: string) => {
+    try {
+      await analyzeDocument({ projectId, fileId, fileContent });
+    } catch (error) {
+      console.error('Failed to trigger analysis flow:', error);
+      // Even if the flow fails to start, the file is uploaded.
+      // The status will be handled within the flow itself.
+       toast({
+        variant: 'destructive',
+        title: 'Analysis Failed',
+        description: 'Could not start the AI analysis for the document.',
+      });
+    }
+  };
+
   const handleUpload = async () => {
     if (!file) {
-      toast({
-        variant: 'destructive',
-        title: 'No file selected',
-        description: 'Please select a file to upload.',
-      });
+      toast({ variant: 'destructive', title: 'No file selected' });
       return;
     }
     if (!projectId) {
-      toast({
-        variant: 'destructive',
-        title: 'Project ID is missing',
-      });
+       toast({ variant: 'destructive', title: 'Project ID is missing' });
       return;
     }
 
@@ -69,53 +76,61 @@ export default function FileUpload({ projectId }: { projectId: string }) {
       },
       (error) => {
         console.error('Upload failed:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Upload Failed',
-          description: error.message,
-        });
+        toast({ variant: 'destructive', title: 'Upload Failed', description: error.message });
         setIsUploading(false);
       },
       async () => {
         try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            const projectDocRef = doc(db, 'projects', projectId);
-            
-            const isGeoJson = file.name.toLowerCase().endsWith('.geojson');
-            const fileType = isGeoJson ? 'geojson' : file.type;
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const filesCollectionRef = collection(db, 'projects', projectId, 'files');
+          
+          const isGeoJson = file.name.toLowerCase().endsWith('.geojson');
+          const fileType = isGeoJson ? 'geojson' : file.type;
 
-            await updateDoc(projectDocRef, {
-                files: arrayUnion({
-                    name: file.name,
-                    url: downloadURL,
-                    type: fileType,
-                    status: 'uploaded',
-                    uploadedAt: new Date().toISOString(),
-                }),
-                fileCount: increment(1)
-            });
+          const newFileDoc = await addDoc(filesCollectionRef, {
+            name: file.name,
+            url: downloadURL,
+            type: fileType,
+            status: 'uploaded',
+            createdAt: serverTimestamp(),
+            projectId: projectId,
+          });
 
-            toast({
-              title: 'Upload Successful',
-              description: `"${file.name}" has been uploaded.`,
-              action: <CheckCircle className="text-green-500" />,
-            });
+          toast({
+            title: 'Upload Successful',
+            description: `"${file.name}" has been uploaded.`,
+            action: <CheckCircle className="text-green-500" />,
+          });
+
+          // If it's a text document, trigger the analysis flow
+          if (allowedTextTypes.includes(file.type)) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const text = e.target?.result as string;
+              triggerAnalysis(newFileDoc.id, text);
+            };
+            reader.readAsText(file);
+          }
+
         } catch (error) {
-            console.error('Failed to update firestore', error);
-             toast({
-              variant: 'destructive',
-              title: 'Database Update Failed',
-              description: "File uploaded, but couldn't save reference.",
-              action: <AlertCircle className="text-yellow-500" />,
-            });
+          console.error('Failed to update firestore', error);
+          toast({
+            variant: 'destructive',
+            title: 'Database Update Failed',
+            description: "File uploaded, but couldn't save its record.",
+            action: <AlertCircle className="text-yellow-500" />,
+          });
         } finally {
-            setIsUploading(false);
-            setFile(null);
-            setUploadProgress(0);
+          setIsUploading(false);
+          setFile(null);
+          setUploadProgress(0);
         }
       }
     );
   };
+
+    const allowedTextTypes = ['application/pdf', 'text/plain', 'text/markdown'];
+
 
   return (
     <div className="space-y-4">
