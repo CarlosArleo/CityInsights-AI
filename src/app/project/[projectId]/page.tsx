@@ -35,7 +35,14 @@ function ProjectWorkspace() {
     setLoading(true);
     const unsubProject = onSnapshot(doc(db, 'projects', projectId), (doc) => {
       if (doc.exists()) {
-        setProject({ id: doc.id, ...doc.data() } as Project);
+        const data = doc.data()
+        setProject({ 
+            id: doc.id,
+            name: data.name,
+            description: data.description,
+            ownerId: data.ownerId,
+            createdAt: data.createdAt?.toDate(),
+         } as Project);
       } else {
         setProject(null);
       }
