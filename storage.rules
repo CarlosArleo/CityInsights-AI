@@ -1,5 +1,4 @@
 rules_version = '2';
-
 service firebase.storage {
   match /b/{bucket}/o {
     // Match any file path that follows the structure: users/{userId}/projects/{projectId}/{fileName}
