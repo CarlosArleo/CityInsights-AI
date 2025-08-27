@@ -41,11 +41,12 @@ export default function AuthForm() {
         await signInWithEmailAndPassword(auth, email, password);
       }
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
         title: 'Authentication Failed',
-        description: error.message || 'An unknown error occurred.',
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -58,11 +59,12 @@ export default function AuthForm() {
     try {
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
        toast({
         variant: 'destructive',
         title: 'Google Sign-In Failed',
-        description: error.message || 'An unknown error occurred.',
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

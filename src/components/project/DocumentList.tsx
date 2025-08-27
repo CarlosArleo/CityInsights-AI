@@ -1,7 +1,6 @@
 
 'use client';
 
-import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Clock, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import type { ProjectFile } from '@/lib/types';
 

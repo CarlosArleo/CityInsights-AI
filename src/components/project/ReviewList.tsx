@@ -1,7 +1,6 @@
 
 'use client';
 
-import { Skeleton } from '@/components/ui/skeleton';
 import ReviewCardComponent, { Review } from './ReviewCard'; // Renamed to avoid conflict
 import type { ReviewCard } from '@/lib/types';
 
@@ -26,4 +25,3 @@ export default function ReviewList({ reviews }: ReviewListProps) {
     </div>
   );
 }
-

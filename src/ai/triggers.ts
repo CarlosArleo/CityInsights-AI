@@ -1,7 +1,6 @@
 
 'use server';
 
-import { onObjectFinalized } from 'firebase-functions/v2/storage';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps } from 'firebase-admin/app';
 import { getStorage } from 'firebase-admin/storage';
