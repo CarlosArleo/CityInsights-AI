@@ -4,20 +4,27 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useMap } from '@/context/MapContext';
+import type { ProjectFile } from '@/lib/types';
 
 if (process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 }
 
-export default function MapComponent() {
+interface MapComponentProps {
+    activeLayers: ProjectFile[];
+}
+
+const layerColors = ['#F44336', '#2196F3', '#4CAF50', '#FFEB3B', '#9C27B0', '#FF9800'];
+
+export default function MapComponent({ activeLayers }: MapComponentProps) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [lng] = useState(-74.0060);
   const [lat] = useState(40.7128);
   const [zoom] = useState(9);
-  const { activeLayers } = useMap();
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+  const activeLayerIds = activeLayers.map(l => l.id);
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
@@ -50,58 +57,47 @@ export default function MapComponent() {
   useEffect(() => {
     if (!isMapLoaded || !map.current) return;
 
-    Object.keys(activeLayers).forEach(layerId => {
-        const layerInfo = activeLayers[layerId];
-        const sourceId = `source-${layerId}`;
-        const layerPaintId = `layer-paint-${layerId}`;
+    const currentMapLayerIds = map.current.getStyle().layers
+        .map(l => l.id)
+        .filter(id => id.startsWith('layer-paint-'))
+        .map(id => id.replace('layer-paint-', ''));
 
-        const source = map.current!.getSource(sourceId);
-
-        if (layerInfo.visible) {
-            if (!source) {
-                // Add new source and layer
-                map.current!.addSource(sourceId, {
-                    type: 'geojson',
-                    data: layerInfo.url
-                });
-                map.current!.addLayer({
-                    id: layerPaintId,
-                    type: 'fill',
-                    source: sourceId,
-                    paint: {
-                        'fill-color': layerInfo.color,
-                        'fill-opacity': 0.6
-                    }
-                });
+    // Remove layers that are no longer active
+    currentMapLayerIds.forEach(mapLayerId => {
+        if (!activeLayerIds.includes(mapLayerId)) {
+            const sourceId = `source-${mapLayerId}`;
+            if (map.current?.getLayer(mapLayerId)) {
+                map.current.removeLayer(mapLayerId);
             }
-        } else {
-            // Remove layer and source if it exists and should be hidden
-            if (source) {
-                if (map.current!.getLayer(layerPaintId)) {
-                    map.current!.removeLayer(layerPaintId);
-                }
-                map.current!.removeSource(sourceId);
+            if (map.current?.getSource(sourceId)) {
+                map.current.removeSource(sourceId);
             }
         }
     });
 
-    // Clean up layers that are no longer in activeLayers
-    const currentMapLayers = map.current.getStyle().layers;
-    if(currentMapLayers){
-        currentMapLayers.forEach(mapLayer => {
-            if (mapLayer.id.startsWith('layer-paint-')) {
-                const layerId = mapLayer.id.replace('layer-paint-', '');
-                if (!activeLayers[layerId] || !activeLayers[layerId].visible) {
-                    const sourceId = `source-${layerId}`;
-                    if (map.current!.getLayer(mapLayer.id)) map.current!.removeLayer(mapLayer.id);
-                    if (map.current!.getSource(sourceId)) map.current!.removeSource(sourceId);
+    // Add new active layers
+    activeLayers.forEach((layerInfo, index) => {
+        const sourceId = `source-${layerInfo.id}`;
+        const layerPaintId = `layer-paint-${layerInfo.id}`;
+
+        if (!map.current?.getSource(sourceId)) {
+            map.current?.addSource(sourceId, {
+                type: 'geojson',
+                data: layerInfo.url
+            });
+            map.current?.addLayer({
+                id: layerPaintId,
+                type: 'fill',
+                source: sourceId,
+                paint: {
+                    'fill-color': layerColors[index % layerColors.length],
+                    'fill-opacity': 0.6
                 }
-            }
-        });
-    }
+            });
+        }
+    });
 
-
-  }, [activeLayers, isMapLoaded]);
+  }, [activeLayers, activeLayerIds, isMapLoaded]);
 
 
   if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {

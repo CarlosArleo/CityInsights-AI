@@ -10,7 +10,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function FileUpload({ projectId }: { projectId: string }) {
+interface FileUploadProps {
+  projectId: string;
+  onUploadComplete: () => void;
+}
+
+export default function FileUpload({ projectId, onUploadComplete }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -84,6 +89,7 @@ export default function FileUpload({ projectId }: { projectId: string }) {
             description: `"${file.name}" has been queued for analysis.`,
             action: <CheckCircle className="text-green-500" />,
           });
+          onUploadComplete();
 
         } catch (error: any) {
           console.error('Failed to create file metadata in Firestore', error);

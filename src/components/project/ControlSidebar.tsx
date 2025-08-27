@@ -1,9 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import FileUpload from '@/components/project/FileUpload';
 import DocumentList from '@/components/project/DocumentList';
 import GeospatialLayerList from './GeospatialLayerList';
@@ -12,56 +9,52 @@ import StrategicAnalysis from './StrategicAnalysis';
 import SidebarHeader from './SidebarHeader';
 import { ScrollArea } from '../ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import type { Project, ProjectFile, ReviewCard } from '@/lib/types';
 
-interface Project {
-  name: string;
-}
 
 interface ControlSidebarProps {
-  projectId: string;
+  project: Project | null;
+  files: ProjectFile[];
+  reviews: ReviewCard[];
+  activeLayers: string[];
+  onLayerToggle: (fileId: string) => void;
+  onUploadComplete: () => void;
 }
 
-export default function ControlSidebar({ projectId }: ControlSidebarProps) {
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!projectId) return;
-    setLoading(true);
-    const docRef = doc(db, 'projects', projectId);
-
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setProject(docSnap.data() as Project);
-      } else {
-        console.log("No such document!");
-        setProject(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [projectId]);
+export function ControlSidebar({ 
+  project, 
+  files, 
+  reviews, 
+  activeLayers, 
+  onLayerToggle, 
+  onUploadComplete 
+}: ControlSidebarProps) {
+  const geoJsonFiles = files.filter(f => f.type === 'geojson');
+  const documentFiles = files.filter(f => f.type === 'document');
 
   return (
     <div 
-      className="absolute top-0 left-0 z-10 w-[350px] h-screen flex flex-col bg-gray-900/20 backdrop-blur-sm text-[var(--sidebar-foreground)] shadow-2xl"
+      className="absolute top-0 left-0 z-10 w-[380px] h-screen flex flex-col bg-gray-900/10 backdrop-blur-md text-[var(--sidebar-foreground)] shadow-2xl"
     >
-      <SidebarHeader project={project} loading={loading} />
+      <SidebarHeader project={project} loading={!project} />
       <ScrollArea className="flex-1">
         <div className="p-4">
           <Accordion type="multiple" defaultValue={['data', 'review']} className="w-full">
             <AccordionItem value="data">
               <AccordionTrigger className="text-lg font-semibold hover:no-underline">Data Management</AccordionTrigger>
               <AccordionContent className="space-y-4 pt-4">
-                <FileUpload projectId={projectId} />
+                <FileUpload projectId={project?.id || ''} onUploadComplete={onUploadComplete} />
                 <div>
                   <h3 className="font-semibold text-gray-300 mb-2">Documents</h3>
-                  <DocumentList projectId={projectId} />
+                  <DocumentList files={documentFiles} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-300 mb-2">Map Layers</h3>
-                  <GeospatialLayerList projectId={projectId} />
+                  <GeospatialLayerList 
+                    files={geoJsonFiles} 
+                    activeLayers={activeLayers}
+                    onLayerToggle={onLayerToggle}
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -69,7 +62,7 @@ export default function ControlSidebar({ projectId }: ControlSidebarProps) {
             <AccordionItem value="review">
               <AccordionTrigger className="text-lg font-semibold hover:no-underline">Qualitative Analysis (HITL)</AccordionTrigger>
               <AccordionContent className="pt-4">
-                <ReviewList projectId={projectId} />
+                <ReviewList reviews={reviews} />
               </AccordionContent>
             </AccordionItem>
 
