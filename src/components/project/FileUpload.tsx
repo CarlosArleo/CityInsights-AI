@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useState } from 'react';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, StorageError } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
@@ -59,7 +58,7 @@ export default function FileUpload({ projectId, onUploadComplete }: FileUploadPr
       () => {
         // Optional: update toast with progress here
       },
-      (error: any) => {
+      (error: StorageError) => {
         console.error('Upload failed:', error);
         toastRef.update({ id: toastRef.id, variant: 'destructive', title: 'Upload Failed', description: error.message });
         setIsUploading(false);
@@ -91,7 +90,7 @@ export default function FileUpload({ projectId, onUploadComplete }: FileUploadPr
           });
           onUploadComplete();
 
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to create file metadata in Firestore', error);
           toastRef.update({
             id: toastRef.id,
