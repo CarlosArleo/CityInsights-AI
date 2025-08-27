@@ -1,24 +1,23 @@
+'use client'; // This remains a client component because of the hooks
 
-'use client';
+import React, { useEffect, useState, useMemo } from 'react'; // Import React
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AuthRoute from '@/components/auth/AuthRoute';
 import { Loader2 } from 'lucide-react';
 import type { Project, ProjectFile, ReviewCard } from '@/lib/types';
 import { db } from '@/lib/firebase/config';
 import { collection, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
-import React, { useEffect, useState, useMemo } from 'react'; 
-import { ControlSidebar } from '@/components/project/ControlSidebar';
+import { useParams } from 'next/navigation';
+import { ControlSidebar } from '@/components/project/ControlSidebar'; 
 import dynamic from 'next/dynamic';
 
-// Define the correct props type for the page
-type ProjectPageProps = {
-  params: { projectId: string };
-};
+// This is the main component that will be rendered by the page
+function ProjectWorkspace() {
+  // We use useParams() here, which is the standard hook for client components
+  const params = useParams();
+  const projectId = params.projectId as string;
 
-// Main component for the project page logic
-function ProjectPageContents({ params }: ProjectPageProps) {
-  const { projectId } = params; 
   const [project, setProject] = useState<Project | null>(null);
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [reviews, setReviews] = useState<ReviewCard[]>([]);
@@ -26,7 +25,7 @@ function ProjectPageContents({ params }: ProjectPageProps) {
   const [activeLayerIds, setActiveLayerIds] = useState<string[]>([]);
   
   const MapComponent = useMemo(() => dynamic(() => import('@/components/project/MapComponent'), {
-      loading: () => <div className="w-full h-full bg-gray-800 flex items-center justify-center text-white"><Loader2 /></div>,
+      loading: () => <div className="w-full h-full bg-gray-800 flex items-center justify-center text-white"><Loader2 className="h-8 w-8 animate-spin" /></div>,
       ssr: false
   }), []);
 
@@ -36,13 +35,7 @@ function ProjectPageContents({ params }: ProjectPageProps) {
     setLoading(true);
     const unsubProject = onSnapshot(doc(db, 'projects', projectId), (doc) => {
       if (doc.exists()) {
-        const data = doc.data();
-        setProject({
-          id: doc.id,
-          name: data.name,
-          ownerId: data.ownerId,
-          createdAt: data.createdAt?.toDate(),
-        });
+        setProject({ id: doc.id, ...doc.data() } as Project);
       } else {
         setProject(null);
       }
@@ -51,8 +44,7 @@ function ProjectPageContents({ params }: ProjectPageProps) {
     
     const qFiles = query(collection(db, 'projects', projectId, 'files'), orderBy('createdAt', 'desc'));
     const unsubFiles = onSnapshot(qFiles, (snapshot) => {
-      const newFiles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProjectFile));
-      setFiles(newFiles);
+      setFiles(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProjectFile)));
     });
 
     const qReviews = query(collection(db, 'projects', projectId, 'reviews'), orderBy('createdAt', 'desc'));
@@ -80,7 +72,7 @@ function ProjectPageContents({ params }: ProjectPageProps) {
   }
 
   if (!project) {
-    return <div className="flex h-screen w-screen items-center justify-center bg-background">Project not found or you do not have access.</div>;
+    return <div className="flex h-screen w-screen items-center justify-center bg-background">Project not found.</div>;
   }
 
   const activeLayers = files.filter(f => activeLayerIds.includes(f.id));
@@ -97,21 +89,18 @@ function ProjectPageContents({ params }: ProjectPageProps) {
         reviews={reviews}
         activeLayers={activeLayerIds}
         onLayerToggle={handleLayerToggle}
-        onUploadComplete={() => { /* Can be used to trigger refetches if needed */ }}
+        onUploadComplete={() => {}}
       />
     </div>
   );
 }
 
-// The default export for the page, which handles the Next.js props
-export default function GuardedProjectPage({ params }: { params: { projectId: string } }) {
-    const mapboxApiKey = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-    if (!mapboxApiKey) {
-      return <div className="h-screen w-screen flex items-center justify-center bg-background"><p>NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not configured.</p></div>
-    }
+
+// This is the default export for the page. It handles the auth guard.
+export default function GuardedProjectPage() {
     return (
-      <ProtectedRoute>
-        <ProjectPageContents params={params} />
-      </ProtectedRoute>
+      <AuthRoute>
+        <ProjectWorkspace />
+      </AuthRoute>
     );
 }
