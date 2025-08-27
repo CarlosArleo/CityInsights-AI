@@ -1,9 +1,12 @@
+
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ProjectWorkspace from '@/components/project/ProjectWorkspace';
 import { MapProvider } from '@/context/MapContext';
+import * as React from 'react';
 
-// This page now correctly receives the dynamic projectId from the URL and is an async component
+// This server component is now async to correctly handle the params promise.
 export default async function ProjectPage({ params }: { params: { projectId: string } }) {
+  
   return (
     <ProtectedRoute>
       <MapProvider>

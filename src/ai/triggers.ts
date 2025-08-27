@@ -1,7 +1,7 @@
 
 'use server';
 
-import { onFileCreate } from 'firebase-functions/v2/storage';
+import { onObjectFinalized } from 'firebase-functions/v2/storage';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps } from 'firebase-admin/app';
 import { getStorage } from 'firebase-admin/storage';
@@ -37,7 +37,7 @@ export const onFileUpload = onDocumentCreated('projects/{projectId}/files/{fileI
             const fileContent = fileContentBuffer.toString('utf-8');
 
             console.log(`Starting analysis for document: ${data.name}`);
-            await analyzeDocumentFlow({
+            await analyzeDocumentFlow.flow.invoke(undefined, {
                 projectId,
                 fileId,
                 fileContent,
@@ -47,7 +47,7 @@ export const onFileUpload = onDocumentCreated('projects/{projectId}/files/{fileI
 
         } else if (data.type === 'geojson') {
             console.log(`Starting processing for geojson: ${data.name}`);
-            await processGeospatialDataFlow({
+            await processGeospatialDataFlow.flow.invoke(undefined, {
                 projectId,
                 fileId,
             });
