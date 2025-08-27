@@ -34,10 +34,11 @@ export const onFileUpload = onDocumentCreated('projects/{projectId}/files/{fileI
             // Fetch the file content from Cloud Storage
             const file = storage.bucket().file(data.storagePath);
             const fileContentBuffer = await file.download();
-            const fileContent = fileContentBuffer.toString('utf-8');
+            const fileContent = fileContentBuffer.toString();
 
             console.log(`Starting analysis for document: ${data.name}`);
-            await analyzeDocumentFlow.flow.invoke(undefined, {
+            // Correctly invoke the flow as a direct function call
+            await analyzeDocumentFlow({
                 projectId,
                 fileId,
                 fileContent,
@@ -47,7 +48,8 @@ export const onFileUpload = onDocumentCreated('projects/{projectId}/files/{fileI
 
         } else if (data.type === 'geojson') {
             console.log(`Starting processing for geojson: ${data.name}`);
-            await processGeospatialDataFlow.flow.invoke(undefined, {
+            // Correctly invoke the flow as a direct function call
+            await processGeospatialDataFlow({
                 projectId,
                 fileId,
             });
